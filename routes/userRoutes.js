@@ -146,4 +146,60 @@ module.exports = (app, upload) => {
      *         description: Lista de repartidores obtenida exitosamente
      */
     app.get('/api/users/findDeliveryMen', passport.authenticate('jwt', { session:false }), userController.findeDeliveryMen);
+
+    /**
+     * @swagger
+     * /api/users/getAll:
+     *   get:
+     *     summary: Obtener todos los usuarios
+     *     tags: [Users]
+     *     security:
+     *       - bearerAuth: []
+     *     responses:
+     *       200:
+     *         description: Lista de usuarios obtenida exitosamente
+     */
+    app.get('/api/users/getAll', passport.authenticate('jwt', { session: false }), userController.getAll);
+
+    /**
+     * @swagger
+     * /api/users/createWithRole:
+     *   post:
+     *     summary: Crear un nuevo usuario con rol asignado
+     *     tags: [Users]
+     *     security:
+     *       - bearerAuth: []
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         multipart/form-data:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               user:
+     *                 type: string
+     *               id_rol:
+     *                 type: string
+     *               image:
+     *                 type: string
+     *                 format: binary
+     *     responses:
+     *       201:
+     *         description: Usuario creado exitosamente
+     */
+    app.post('/api/users/createWithRole', passport.authenticate('jwt', { session: false }), upload.array('image', 1), userController.createWithRole);
+
+    /**
+     * @swagger
+     * /api/users/getAllRoles:
+     *   get:
+     *     summary: Obtener todos los roles disponibles
+     *     tags: [Users]
+     *     security:
+     *       - bearerAuth: []
+     *     responses:
+     *       200:
+     *         description: Lista de roles obtenida exitosamente
+     */
+    app.get('/api/users/getAllRoles', passport.authenticate('jwt', { session: false }), userController.getAllRoles);
 }

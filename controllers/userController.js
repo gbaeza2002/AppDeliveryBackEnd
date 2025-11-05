@@ -191,5 +191,82 @@ module.exports = {
                 data: data
             })
         })
+    },
+
+    getAll(req, res) {
+        User.getAll((err, data) => {
+            if (err) {
+                return res.status(501).json({
+                    success: false,
+                    message: 'Hubo un error al obtener los usuarios',
+                    error: err
+                })
+            }
+
+            return res.status(200).json(data)
+        })
+    },
+
+    async createWithRole(req, res) {
+        const user = JSON.parse(req.body.user || JSON.stringify(req.body));
+        const files = req.files;
+        const id_rol = req.body.id_rol || user.id_rol;
+
+        if (!id_rol) {
+            return res.status(400).json({
+                success: false,
+                message: 'El rol es requerido'
+            })
+        }
+
+        // Subir imagen si existe
+        if (files && files.length > 0) {
+            const path = `image_${Date.now()}`;
+            const url = await storage(files[0], path);
+            if (url) {
+                user.image = url;
+            }
+        }
+
+        User.create(user, (err, id_user) => {
+            if (err) {
+                return res.status(501).json({
+                    success: false,
+                    message: 'Hubo un error con la creación del usuario',
+                    error: err
+                })
+            }
+
+            // Asignar el rol al usuario
+            Rol.create(id_user, id_rol, (err, data) => {
+                if (err) {
+                    return res.status(501).json({
+                        success: false,
+                        message: 'Hubo un error al asignar el rol al usuario',
+                        error: err
+                    })
+                }
+
+                return res.status(201).json({
+                    success: true,
+                    message: 'El usuario se creó correctamente',
+                    data: `${id_user}`
+                })
+            });
+        })
+    },
+
+    getAllRoles(req, res) {
+        Rol.getAll((err, data) => {
+            if (err) {
+                return res.status(501).json({
+                    success: false,
+                    message: 'Hubo un error al obtener los roles',
+                    error: err
+                })
+            }
+
+            return res.status(200).json(data)
+        })
     }
 }

@@ -15,6 +15,18 @@ const myIP = require('./getMyIP')
 const swaggerUi = require('swagger-ui-express');
 const swaggerJSDoc = require('swagger-jsdoc');
 
+const { MercadoPagoConfig } = require('mercadopago');
+
+// Configurar MercadoPago
+const client = new MercadoPagoConfig({
+    accessToken: "TEST-6646338381637942-092211-c941d55f58d7a3927f55a0733bd93588-443398336",
+    options: {
+        sandbox: true
+    }
+});
+
+// Exportar el cliente para usar en otros módulos
+module.exports.mercadopagoClient = client;
 
 /*
  * Import routes
@@ -24,6 +36,8 @@ const categoriesRoutes = require('./routes/categoriesRoutes')
 const productsRoutes = require('./routes/productsRoutes')
 const addressRoutes = require('./routes/addressRoutes')
 const orderRoutes = require('./routes/orderRoutes')
+const mercadoPagoRoutes = require('./routes/mercadoPagoRoutes')
+const orderRestaurantRoutes = require('./routes/orderRestaurantRoutes')
 
 const port = process.env.PORT || 3000;
 
@@ -89,6 +103,8 @@ categoriesRoutes(app, upload);
 productsRoutes(app, upload);
 addressRoutes(app)
 orderRoutes(app);
+orderRestaurantRoutes(app);
+mercadoPagoRoutes(app);
 
 
 server.listen(3000, myIP || 'localhost', function () {

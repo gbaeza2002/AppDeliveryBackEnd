@@ -28,4 +28,30 @@ Rol.create = (id_user, id_rol, result) => {
     )
 }
 
+Rol.getAll = (result) => {
+    const sql = `
+        SELECT 
+            id,
+            name,
+            image,
+            route
+        FROM 
+            roles
+        ORDER BY 
+            name
+    `;
+    
+    db.query(
+        sql,
+        (err, data) => {
+            if (err) {
+                console.log('Error:' + err)
+                result(err, null)
+            } else {
+                result(null, data)
+            }
+        }
+    )
+}
+
 module.exports = Rol;

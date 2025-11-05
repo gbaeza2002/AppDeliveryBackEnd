@@ -250,4 +250,55 @@ User.updateWithOutImage = (user, result) => {
 
 }
 
+User.getAll = (result) => {
+    const sql = `
+        select
+            U.id, 
+            U.email,
+            U.name,
+            U.lastname,
+            U.image,
+            U.phone,
+            json_arrayagg(
+                json_object(
+                    'id', CONVERT(R.id, char),
+                    'name', R.name,
+                    'image', R.image,
+                    'route', R.route
+                )
+            ) as roles
+        from
+            users as U
+        left join 
+            user_has_roles as UHR
+        ON
+            UHR.id_user = U.id
+        left join 
+            roles as R
+        on
+            UHR.id_rol = R.id
+        group by
+            U.id
+        order by
+            U.name
+    `;
+
+    db.query(
+        sql,
+        (err, data) => {
+            if (err) {
+                console.log('Error:' + err)
+                result(err, null)
+            } else {
+                // Parsear los roles que vienen como JSON string
+                const parsedData = data.map(user => ({
+                    ...user,
+                    roles: typeof user.roles === 'string' ? JSON.parse(user.roles) : (user.roles || []).filter(r => r.id !== null)
+                }))
+                result(null, parsedData)
+            }
+        }
+    )
+}
+
 module.exports = User;
